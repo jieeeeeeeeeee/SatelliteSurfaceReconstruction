@@ -165,13 +165,24 @@ def image_crop_worker_general(
 
         ul_col, ul_row, width, height = intersect
 
-        # crop ntf
-        idx1 = ntf_file.rfind("/")
+        # crop ntf for windows
+        #idx1 = ntf_file.rfind("/")
+        idx1 = ntf_file.rfind("\\")
         idx2 = ntf_file.rfind(".")
         base_name = ntf_file[idx1 + 1 : idx2]
         out_png = os.path.join(
-            out_dir, "{}:{:04d}:{}.{}".format(pid, current_idx, base_name, oft)
+            out_dir, "{}%{:04d}%{}.{}".format(pid, current_idx, base_name, oft)
         )
+        
+        # crop ntf
+        #
+        #idx1 = ntf_file.rfind('\\')
+        #idx2 = ntf_file.rfind('.')
+        #base_name = ntf_file[idx1+1:idx2]
+       # out_png = os.path.join(out_dir, '{}:{:04d}:{}.png'.format(pid, n, base_name))
+
+        print(out_png)
+
 
         if ift.lower() == "pan":
             bands = None
@@ -236,7 +247,7 @@ def image_crop_worker_general(
         meta_dict["ul_row_original"] = ul_row
 
         out_json = os.path.join(
-            out_dir, "{}:{:04d}:{}.json".format(pid, current_idx, base_name)
+            out_dir, "{}%{:04d}%{}.json".format(pid, current_idx, base_name)
         )
         with open(out_json, "w") as fp:
             json.dump(meta_dict, fp, indent=2)
@@ -343,14 +354,15 @@ def image_crop_general(
 
     for i in range(len(all_files)):
         img_file, meta_file = all_files[i]
-        idx = img_file.rfind(":")
+        #for windows
+        idx = img_file.rfind("%")
         sensor = sensor_ids[img_file]
         time = img_file[idx + 1 : idx + 8]
         target_img_name = "{:04d}_{}_{}_{}".format(
             i, sensor, time, img_file[idx + 8 :]
         )
-
-        idx = meta_file.rfind(":")
+            #for windows
+        idx = meta_file.rfind("%")
         time = img_file[idx + 1 : idx + 8]
         target_xml_name = "{:04d}_{}_{}_{}".format(
             i, sensor, time, meta_file[idx + 8 :]

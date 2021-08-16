@@ -2,7 +2,7 @@ import os
 import subprocess
 from ssr.utility.logging_extension import logger
 from ssr.config.ssr_config import SSRConfig
-
+from ssr.gdal_utility.run_gdal import run_gdal_cmd
 
 class ColmapMVSReconstructor:
     def __init__(self):
@@ -16,14 +16,14 @@ class ColmapMVSReconstructor:
     ):
         logger.info("reconstruct_mesh: ...")
         logger.vinfo("mesh_ply_ofp", mesh_ply_ofp)
-
+        print(self.colmap_exe_dp)
         assert os.path.isdir(self.colmap_exe_dp)
-        assert os.path.isfile(os.path.join(self.colmap_exe_dp, "colmap"))
+        assert os.path.isfile(os.path.join(self.colmap_exe_dp, "colmap.exe"))
         if not os.path.isfile(mesh_ply_ofp) or not lazy:
             os.environ["PATH"] += os.pathsep + self.colmap_exe_dp
             trim_thresh_str = str(poisson_trim_thresh)
             dense_mesher_call = [
-                "colmap",
+                "colmap.exe",
                 "poisson_mesher",
                 "--input_path",
                 point_cloud_ply_ifp,
@@ -33,7 +33,11 @@ class ColmapMVSReconstructor:
                 trim_thresh_str,
             ]
             logger.vinfo("dense_mesher_call: ", dense_mesher_call)
-            subprocess.call(dense_mesher_call)
+            # for windows
+            dense_mesher_call = ' '.join(dense_mesher_call)
+            print(dense_mesher_call)
+            run_gdal_cmd(dense_mesher_call)
+            #subprocess.call(dense_mesher_call)
 
         logger.info("reconstruct_mesh: Done")
 
@@ -47,14 +51,14 @@ class ColmapMVSReconstructor:
     ):
 
         logger.info("reconstruct_mesh: ...")
-
+        colmap_exe = os.path.join(self.colmap_exe_dp, "colmap.exe")
         assert os.path.isdir(self.colmap_exe_dp)
-        assert os.path.isfile(os.path.join(self.colmap_exe_dp, "colmap"))
+        assert os.path.isfile(os.path.join(self.colmap_exe_dp, "colmap.exe"))
         if not os.path.isfile(mesh_ply_ofp) or not lazy:
             os.environ["PATH"] += os.pathsep + self.colmap_exe_dp
 
             dense_mesher_call = [
-                "colmap",
+                colmap_exe,
                 "delaunay_mesher",
                 "--input_path",
                 reconstruction_idp,
@@ -75,8 +79,12 @@ class ColmapMVSReconstructor:
                     "--DelaunayMeshing.max_depth_dist",
                     str(max_depth_dist),
                 ]
-
+            
             logger.vinfo("dense_mesher_call: ", dense_mesher_call)
-            subprocess.call(dense_mesher_call)
+            # for windows
+            dense_mesher_call = ' '.join(dense_mesher_call)
+            print(dense_mesher_call)
+            run_gdal_cmd(dense_mesher_call)
+            #subprocess.call(dense_mesher_call)
 
         logger.info("reconstruct_mesh: Done")

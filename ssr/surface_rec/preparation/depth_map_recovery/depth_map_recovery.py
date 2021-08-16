@@ -84,19 +84,68 @@ def compute_extended_proj_and_inv_proj_mat(camera, last_row, value_range=10):
         proj_scaling_factor,
         overall_inv_proj_scaling_factor,
     )
+import numpy.core.numeric as _nx
+from numpy.core.numeric import isnan
+#from .ufunclike import isneginf, isposinf
+
+import numpy.core.numeric as nx
+def isposinf(x, out=None):
+    return nx.logical_and(nx.isinf(x), ~nx.signbit(x), out)
+
+
+def isneginf(x, out=None):
+    return nx.logical_and(nx.isinf(x), nx.signbit(x), out)
+
+
+def _getmaxmin(t):
+    from numpy.core import getlimits
+    f = getlimits.finfo(t)
+    return f.max, f.min
+def nan_to_num1(x, copy=True, nan=0.0, posinf=None, neginf=None):
+
+    x = _nx.array(x, subok=True, copy=copy)
+    xtype = x.dtype.type
+
+    isscalar = (x.ndim == 0)
+
+    if not issubclass(xtype, _nx.inexact):
+        return x[()] if isscalar else x
+
+    iscomplex = issubclass(xtype, _nx.complexfloating)
+
+    dest = (x.real, x.imag) if iscomplex else (x,)
+    maxf, minf = _getmaxmin(x.real.dtype)
+    if posinf is not None:
+        maxf = posinf
+    if neginf is not None:
+        minf = neginf
+    for d in dest:
+        idx_nan = isnan(d)
+        idx_posinf = isposinf(d)
+        idx_neginf = isneginf(d)
+        _nx.copyto(d, nan, where=idx_nan)
+        _nx.copyto(d, maxf, where=idx_posinf)
+        _nx.copyto(d, minf, where=idx_neginf)
+    return x[()] if isscalar else x
+
+#-----------------------------------------------------------------------------
+
+
 
 
 def parse_depth_map(depth_map_fp):
     depth_map = read_array(depth_map_fp)
-    contains_nan_value = contains_nan(depth_map)
+    # contains_nan_value = contains_nan(depth_map)
     # logger.info(depth_map_fp + ' contains nan: ' + str(contains_nan_value))
     depth_map[depth_map <= 0.0] = np.nan  # actually it is -1e20
     return depth_map
 
 
+
+
 def write_depth_map(depth_map, depth_map_ofp):
     depth_map_copy = depth_map.copy()
-    depth_map_copy = np.nan_to_num(depth_map_copy, nan=-1e20)
+    depth_map_copy = nan_to_num1(depth_map_copy, nan=-1e20)
     write_array(depth_map_copy, depth_map_ofp)
 
 

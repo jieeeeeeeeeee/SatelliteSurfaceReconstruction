@@ -72,8 +72,10 @@ class PreparationPipeline:
         joint_tone_mapping = (
             False  # Separate tone mapping yields much better results
         )
-        execute_parallel = True
-
+        # change by qu
+        # execute_parallel = True
+        execute_parallel = False
+        
         # === Additional options for pan_sharpening === #
         resampling_algorithm = "cubic"
         pm = self.pm

@@ -3,7 +3,7 @@ import subprocess
 from ssr.utility.logging_extension import logger
 from ssr.utility.os_extension import get_corresponding_files_in_directories
 from ssr.utility.os_extension import mkdir_safely
-
+from ssr.gdal_utility.run_gdal import run_gdal_cmd
 
 def perform_pan_sharpening(
     pan_ifp, msi_ifp, ofp, resampling_algorithm="cubic"
@@ -15,13 +15,17 @@ def perform_pan_sharpening(
     ext = os.path.splitext(ofp)[1]
     of = ext[1:]
 
-    call_params = ["gdal_pansharpen.py"]
+    call_params = ["python C:/Users/Administrator/anaconda3/envs/colmap_sat/Lib/site-packages/osgeo/scripts/gdal_pansharpen.py"]
     call_params += ["-of", of, "-r", resampling_algorithm]
 
     call_params += [pan_ifp, msi_ifp, ofp]
     logger.vinfo("call_params", call_params)
-    sharp_process = subprocess.Popen(call_params)
-    sharp_process.wait()
+    # for windows
+    call_params = ' '.join(call_params)
+    print(call_params)
+    run_gdal_cmd(call_params)
+    #sharp_process = subprocess.Popen(call_params)
+   # sharp_process.wait()
 
 
 def perform_pan_sharpening_for_folder(
@@ -71,10 +75,21 @@ if __name__ == "__main__":
     #     resampling_algorithm='cubic')
 
     # ========================= Single File =======================
-    pan_idp = "/path/to/pan"
-    msi_idp = "/path/to/msi"
-    odp = "path/to/pansharped"
+    #pan_idp = "/path/to/pan"
+    #msi_idp = "/path/to/msi"
+    #odp = "path/to/pansharped"
+#
+    #perform_pan_sharpening_for_folder(
+    #    pan_idp, msi_idp, odp, resampling_algorithm="cubic"
+    #)
 
-    perform_pan_sharpening_for_folder(
-        pan_idp, msi_idp, odp, resampling_algorithm="cubic"
-    )
+
+    # ========================= Single File =======================
+    pan_ifp = r"D:\experiment\site1-5-13\ssr\pan\images\0000_WV03_15APR02_134716-P1BS-500276959010_02_P001.png"
+    msi_ifp = r'D:\experiment\site1-5-13\ssr\msi\images\0000_WV03_15APR02_134716-M1BS-500276959010_02_P001.png'
+    ofp = r'D:\experiment\site1-5-13\ssr\sharpened_with_skew/a.png'
+    perform_pan_sharpening(
+        pan_ifp,
+        msi_ifp,
+        ofp,
+        resampling_algorithm='cubic')

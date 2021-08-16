@@ -45,7 +45,7 @@ class MeshingStep:
                 colmap_idp,
                 mesh_ply_ofp,
                 # https://colmap.github.io/faq.html
-                max_proj_dist=0,  # Colmap Default Value: 2.5
+                max_proj_dist=2,  # Colmap Default Value: 2.5
                 lazy=lazy,
             )
         plain_mesh_ply_ofp = os.path.join(mesh_odp, plain_mesh_ply_ofn)

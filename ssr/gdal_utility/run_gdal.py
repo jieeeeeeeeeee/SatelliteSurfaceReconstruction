@@ -9,13 +9,19 @@ def run_gdal_cmd(cmd, disable_log=False, input=None):
         logging.info("Running subprocess: {}".format(cmd))
 
     try:
+        #for windows
+        #process = subprocess.Popen(
+        #    shlex.split(cmd),
+        #    stdout=subprocess.PIPE,
+        #    stderr=subprocess.STDOUT,
+        #    stdin=subprocess.PIPE,
+        #)
         process = subprocess.Popen(
-            shlex.split(cmd),
+            cmd, shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             stdin=subprocess.PIPE,
         )
-
         if input is not None:
             # interacting with short-running subprocess
             output = process.communicate(input=input.encode())[0]
