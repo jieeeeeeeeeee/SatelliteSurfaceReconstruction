@@ -39,7 +39,7 @@ class VisSatPipeline:
             inspect_sfm_perspective=True,
             reparam_depth=True,
             colmap_mvs=True,
-            aggregate_2p5d=True,
+            aggregate_2p5d=False,
             aggregate_3d=True,
         )
 
